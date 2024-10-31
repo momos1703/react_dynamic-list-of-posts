@@ -34,5 +34,5 @@ Install Prettier Extention and use this [VSCode settings](https://mate-academy.g
     - Add the `is-loading` class to the submit button while waiting for a response;
     - Add the new comment received as a response from the `API` to the end of the list;
 1. Implement comment deletion
-    - Delete the commnet immediately not waiting for the server response to improve the UX.
+    - Delete the comment immediately not waiting for the server response to improve the UX.
 1. (*) Handle `Add` and `Delete` errors so the user can retry

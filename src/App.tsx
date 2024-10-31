@@ -1,12 +1,8 @@
-// import classNames from 'classnames';
-
 import 'bulma/css/bulma.css';
 import '@fortawesome/fontawesome-free/css/all.css';
 import './App.scss';
 
 import { PostsList } from './components/PostsList';
-// import { PostDetails } from './components/PostDetails';
-
 import { getUsers } from './servises/user';
 import { UserSelector } from './components/UserSelector';
 import { useEffect, useState } from 'react';
@@ -14,18 +10,28 @@ import { User } from './types/User';
 import { Post } from './types/Post';
 import { getPosts } from './servises/post';
 import { Loader } from './components/Loader';
+import classNames from 'classnames';
+import { PostDetails } from './components/PostDetails';
 
 export const App = () => {
   const [users, setUsers] = useState<User[] | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [selectedPost, setSelectedPost] = useState<Post | null>(null);
+  const [isOpenedNewCommentForm, setIsOpenedNewCommentForm] = useState(false);
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(false);
   const showNoPost =
-    selectedUser && !isLoading && !error && posts && posts.length === 0;
+    selectedUser && !isLoading && !error && posts?.length === 0;
+  const showPostList =
+    selectedUser && !isLoading && !error && posts && posts.length > 0;
 
   useEffect(() => {
-    getUsers().then(setUsers);
+    getUsers()
+      .then(setUsers)
+      .catch(usersLoadingError => {
+        throw usersLoadingError;
+      });
   }, []);
 
   useEffect(() => {
@@ -33,6 +39,8 @@ export const App = () => {
       setIsLoading(true);
       setError(false);
       setPosts(null);
+      setSelectedPost(null);
+      setIsOpenedNewCommentForm(false);
 
       getPosts(selectedUser.id)
         .then(setPosts)
@@ -54,7 +62,7 @@ export const App = () => {
           <div className="tile is-parent">
             <div className="tile is-child box is-success">
               <div className="block">
-                {users && (
+                {users && users?.length > 0 && (
                   <UserSelector
                     usersList={users}
                     selectedUser={selectedUser}
@@ -64,7 +72,7 @@ export const App = () => {
               </div>
 
               <div className="block" data-cy="MainContent">
-                {!selectedUser && (
+                {users && !selectedUser && (
                   <p data-cy="NoSelectedUser">No user selected</p>
                 )}
 
@@ -85,63 +93,39 @@ export const App = () => {
                   </div>
                 )}
 
-                {selectedUser &&
-                  !isLoading &&
-                  !error &&
-                  posts &&
-                  posts.length > 0 && <PostsList posts={posts} />}
-
-                {/* {!selectedUser ? (
-                  <p data-cy="NoSelectedUser">No user selected</p>
-                ) : (
-                  <>
-                    {isLoading ? (
-                      <Loader />
-                    ) : (
-                      <>
-                        {error ? (
-                          <div
-                            className="notification is-danger"
-                            data-cy="PostsLoadingError"
-                          >
-                            Something went wrong!
-                          </div>
-                        ) : (
-                          <>
-                            {!posts || posts.length === 0 ? (
-                              <div
-                                className="notification is-warning"
-                                data-cy="NoPostsYet"
-                              >
-                                No posts yet
-                              </div>
-                            ) : (
-                              <PostsList posts={posts} />
-                            )}
-                          </>
-                        )}
-                      </>
-                    )}
-                  </>
-                )} */}
+                {showPostList && (
+                  <PostsList
+                    posts={posts}
+                    selectedPost={selectedPost}
+                    onSelectPost={setSelectedPost}
+                  />
+                )}
               </div>
             </div>
           </div>
 
-          {/* <div
-            data-cy="Sidebar"
-            className={classNames(
-              'tile',
-              'is-parent',
-              'is-8-desktop',
-              'Sidebar',
-              'Sidebar--open',
-            )}
-          >
-            <div className="tile is-child box is-success ">
-              <PostDetails />
+          {selectedPost && (
+            <div
+              data-cy="Sidebar"
+              className={classNames(
+                'tile',
+                'is-parent',
+                'is-8-desktop',
+                'Sidebar',
+                { 'Sidebar--open': selectedPost },
+              )}
+            >
+              <div className="tile is-child box is-success ">
+                {selectedPost && (
+                  <PostDetails
+                    selectedPost={selectedPost}
+                    isOpenedNewCommentForm={isOpenedNewCommentForm}
+                    onOpenNewCommentForm={setIsOpenedNewCommentForm}
+                  />
+                )}
+              </div>
             </div>
-          </div> */}
+          )}
         </div>
       </div>
     </main>

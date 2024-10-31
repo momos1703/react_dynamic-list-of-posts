@@ -26,7 +26,7 @@ export const UserSelector: React.FC<Props> = ({
     <div
       data-cy="UserSelector"
       className={classNames('dropdown', {
-        'is-active': showUsersList,
+        'is-active': showUsersList && usersList.length > 0,
       })}
       onBlur={handleBlur}
     >
@@ -55,22 +55,21 @@ export const UserSelector: React.FC<Props> = ({
 
       <div className="dropdown-menu" id="dropdown-menu" role="menu">
         <div className="dropdown-content">
-          {showUsersList &&
-            usersList.map(user => (
-              <a
-                key={user.id}
-                href={`#${user.id}`}
-                className={classNames('dropdown-item', {
-                  'is-active': selectedUser && user.id === selectedUser.id,
-                })}
-                onClick={() => {
-                  onSelectUser(user);
-                  setShowUsersList(false);
-                }}
-              >
-                {user.name}
-              </a>
-            ))}
+          {usersList.map(user => (
+            <a
+              key={user.id}
+              href={`#${user.id}`}
+              className={classNames('dropdown-item', {
+                'is-active': user.id === selectedUser?.id,
+              })}
+              onClick={() => {
+                onSelectUser(user);
+                setShowUsersList(false);
+              }}
+            >
+              {user.name}
+            </a>
+          ))}
         </div>
       </div>
     </div>
