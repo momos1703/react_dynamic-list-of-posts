@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Post } from '../types/Post';
-import { deleteComment, getComments, postComment } from '../servises/post';
+import { deleteComment, getComments, postComment } from '../services/post';
 import { Loader } from './Loader';
 import { Comment, CommentData } from '../types/Comment';
 import { NewCommentForm } from './NewCommentForm';
@@ -19,13 +19,13 @@ export const PostDetails: React.FC<Props> = ({
   const [comments, setComments] = useState<Comment[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState('');
   const hasNoComments =
-    !isLoading && !error && comments && comments.length === 0;
+    !isLoading && error.length === 0 && comments && comments.length === 0;
   const hasAlreadyComments =
-    !isLoading && !error && comments && comments.length > 0;
+    !isLoading && error.length === 0 && comments && comments.length > 0;
   const isShowNewCommentButton =
-    !isLoading && !isOpenedNewCommentForm && !error;
+    !isLoading && !isOpenedNewCommentForm && error.length === 0;
 
   const addNewComment = ({ name, email, body }: CommentData) => {
     setIsSubmitting(true);
@@ -43,7 +43,7 @@ export const PostDetails: React.FC<Props> = ({
         });
       })
       .catch(loadingError => {
-        setError(true);
+        setError('commentAddError');
 
         throw loadingError;
       })
@@ -60,19 +60,19 @@ export const PostDetails: React.FC<Props> = ({
     );
 
     deleteComment(commentId).catch(() => {
-      setError(true);
+      setError('commentDeletingError');
     });
   };
 
   useEffect(() => {
     setIsLoading(true);
     onOpenNewCommentForm(false);
-    setError(false);
+    setError('');
 
     getComments(selectedPost.id)
       .then(setComments)
       .catch(loadingError => {
-        setError(true);
+        setError('commentsLoadingError');
 
         throw loadingError;
       })
@@ -95,7 +95,7 @@ export const PostDetails: React.FC<Props> = ({
         <div className="block">
           {isLoading && <Loader />}
 
-          {!isLoading && error && (
+          {!isLoading && error.length > 0 && (
             <div className="notification is-danger" data-cy="CommentsError">
               Something went wrong
             </div>
@@ -152,7 +152,7 @@ export const PostDetails: React.FC<Props> = ({
           )}
         </div>
 
-        {isOpenedNewCommentForm && !error && (
+        {isOpenedNewCommentForm && error.length === 0 && (
           <NewCommentForm
             addNewComment={addNewComment}
             isSubmitting={isSubmitting}

@@ -71,6 +71,7 @@ export const NewCommentForm: React.FC<Props> = ({
       })
       .catch(error => {
         setCommentData(initialNewComment);
+
         throw error;
       });
   };

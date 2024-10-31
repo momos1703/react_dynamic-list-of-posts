@@ -3,12 +3,12 @@ import '@fortawesome/fontawesome-free/css/all.css';
 import './App.scss';
 
 import { PostsList } from './components/PostsList';
-import { getUsers } from './servises/user';
+import { getUsers } from './services/user';
 import { UserSelector } from './components/UserSelector';
 import { useEffect, useState } from 'react';
 import { User } from './types/User';
 import { Post } from './types/Post';
-import { getPosts } from './servises/post';
+import { getPosts } from './services/post';
 import { Loader } from './components/Loader';
 import classNames from 'classnames';
 import { PostDetails } from './components/PostDetails';
@@ -20,16 +20,22 @@ export const App = () => {
   const [isOpenedNewCommentForm, setIsOpenedNewCommentForm] = useState(false);
   const [posts, setPosts] = useState<Post[] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState('');
   const showNoPost =
-    selectedUser && !isLoading && !error && posts?.length === 0;
+    selectedUser && !isLoading && error.length === 0 && posts?.length === 0;
   const showPostList =
-    selectedUser && !isLoading && !error && posts && posts.length > 0;
+    selectedUser &&
+    !isLoading &&
+    error.length === 0 &&
+    posts &&
+    posts.length > 0;
 
   useEffect(() => {
     getUsers()
       .then(setUsers)
       .catch(usersLoadingError => {
+        setError('usersLoadingError');
+
         throw usersLoadingError;
       });
   }, []);
@@ -37,7 +43,8 @@ export const App = () => {
   useEffect(() => {
     if (selectedUser) {
       setIsLoading(true);
-      setError(false);
+      // setError(false);
+      setError('');
       setPosts(null);
       setSelectedPost(null);
       setIsOpenedNewCommentForm(false);
@@ -45,7 +52,8 @@ export const App = () => {
       getPosts(selectedUser.id)
         .then(setPosts)
         .catch(loadingError => {
-          setError(true);
+          // setError(true);
+          setError('postsLoadingError');
 
           throw loadingError;
         })
@@ -62,7 +70,7 @@ export const App = () => {
           <div className="tile is-parent">
             <div className="tile is-child box is-success">
               <div className="block">
-                {users && users?.length > 0 && (
+                {users && users.length > 0 && (
                   <UserSelector
                     usersList={users}
                     selectedUser={selectedUser}
@@ -78,7 +86,7 @@ export const App = () => {
 
                 {isLoading && <Loader />}
 
-                {!isLoading && error && (
+                {!isLoading && error.length > 0 && (
                   <div
                     className="notification is-danger"
                     data-cy="PostsLoadingError"
