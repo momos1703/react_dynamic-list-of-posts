@@ -34,7 +34,7 @@ export const App = () => {
     getUsers()
       .then(setUsers)
       .catch(usersLoadingError => {
-        setError('usersLoadingError');
+        setError(`usersLoadingError ${usersLoadingError}`);
 
         throw usersLoadingError;
       });
@@ -52,8 +52,7 @@ export const App = () => {
       getPosts(selectedUser.id)
         .then(setPosts)
         .catch(loadingError => {
-          // setError(true);
-          setError('postsLoadingError');
+          setError(`postsLoadingError ${loadingError}`);
 
           throw loadingError;
         })

@@ -95,7 +95,7 @@ export const NewCommentForm: React.FC<Props> = ({
             id="comment-author-name"
             placeholder="Name Surname"
             className={classNames('input', {
-              'is-danger': false,
+              'is-danger': hasErrorMessage.nameError.length > 0,
             })}
             value={commentData.name}
             onChange={event =>
@@ -139,7 +139,7 @@ export const NewCommentForm: React.FC<Props> = ({
             id="comment-author-email"
             placeholder="email@test.com"
             className={classNames('input', {
-              'is-danger': false,
+              'is-danger': hasErrorMessage.emailError.length > 0,
             })}
             value={commentData.email}
             onChange={event =>
@@ -182,7 +182,7 @@ export const NewCommentForm: React.FC<Props> = ({
             name="body"
             placeholder="Type comment here"
             className={classNames('textarea', {
-              'is-danger': false,
+              'is-danger': hasErrorMessage.bodyError.length > 0,
             })}
             value={commentData.body}
             onChange={event =>

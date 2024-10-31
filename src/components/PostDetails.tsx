@@ -43,7 +43,7 @@ export const PostDetails: React.FC<Props> = ({
         });
       })
       .catch(loadingError => {
-        setError('commentAddError');
+        setError(`commentAddError ${loadingError}`);
 
         throw loadingError;
       })
@@ -59,8 +59,9 @@ export const PostDetails: React.FC<Props> = ({
         : [],
     );
 
-    deleteComment(commentId).catch(() => {
-      setError('commentDeletingError');
+    deleteComment(commentId)
+      .catch(deletingError => {
+      setError(`commentDeletingError ${deletingError}`);
     });
   };
 
@@ -72,7 +73,7 @@ export const PostDetails: React.FC<Props> = ({
     getComments(selectedPost.id)
       .then(setComments)
       .catch(loadingError => {
-        setError('commentsLoadingError');
+        setError(`commentsLoadingError ${loadingError}`);
 
         throw loadingError;
       })
